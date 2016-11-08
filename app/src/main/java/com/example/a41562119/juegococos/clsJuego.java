@@ -23,6 +23,8 @@ import org.cocos2d.opengl.CCGLSurfaceView;
 import org.cocos2d.types.CCPoint;
 import org.cocos2d.types.CCSize;
 
+import java.net.PortUnreachableException;
+import java.nio.channels.GatheringByteChannel;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -37,9 +39,11 @@ public class clsJuego {
     Context _ContextoDelJuego;
     boolean activo = false;
     float temp;
-    Sprite naveJugador,naveEnemiga, ImagenFondo, BordeInferior;
+    int puntos;
+    Sprite naveJugador,naveEnemiga, ImagenFondo, BordeInferior, TuboPuntos;
     Label lblTitulo;
     ArrayList<Sprite> arrEnemigos;
+    ArrayList<Sprite> arrTubos;
     public clsJuego(CCGLSurfaceView _VistaDelJuego){
         _VistaDelJuego=_VistaDelJuego;
     }
@@ -113,10 +117,11 @@ public class clsJuego {
         public CapaDeFrente() {
 
             IniciarNave();
-            ColocarLabel();
+            //ColocarLabel();
             PonerBoton();
 
             arrEnemigos = new ArrayList<Sprite>();
+            arrTubos = new ArrayList<Sprite>();
 
             Random random;
             random = new Random();
@@ -137,6 +142,8 @@ public class clsJuego {
 
                     PonerUnTuboArriba();
                     PonerUnTuboAbajo();
+                    PonerCorrector();
+                    ColocarLabel();
                 }
             };
             // PonerUnTuboArriba();
@@ -149,9 +156,11 @@ public class clsJuego {
                 @Override
                 public void run() {
                     DetectarColisiones();
+                    DetectarPuntos();
                     if (activo ==false)
                     {
-                        SecuenciaAbajo();
+                       // SecuenciaAbajo();
+                        Gravedad();
                     }
 
                 }
@@ -177,7 +186,7 @@ public class clsJuego {
         }
 
         private void ColocarLabel() {
-            lblTitulo = Label.label("Flappy Bird", "Verdana", 30);
+            lblTitulo = Label.label("Flappy Bird: " + puntos, "Verdana", 30);
             float AlturaTitulo;
             AlturaTitulo = lblTitulo.getHeight();
             lblTitulo.setPosition(PantallaDelDispositivo.width / 2, PantallaDelDispositivo.height - AlturaTitulo / 2);
@@ -249,6 +258,40 @@ public class clsJuego {
             // Secuencia();
 
             super.addChild(naveEnemiga);
+
+            //PONER DOS TUBOS DIEFERENTES (ARRIBA Y ABAJO)
+        }
+        void PonerCorrector() {
+            TuboPuntos = Sprite.sprite("Tubo.png");
+            Random random;
+            random = new Random();
+            int num = (random.nextInt(400));
+
+            CCPoint PosicionInicial, PosicionFinal;
+            PosicionInicial = new CCPoint();
+            float AlturaEnemigo, AnchoEnemigo;
+            AlturaEnemigo = TuboPuntos.getHeight();
+            AnchoEnemigo = TuboPuntos.getWidth();
+
+            //PosicionInicial.y = PantallaDelDispositivo.height - AlturaEnemigo/2  - 150 -700;
+            PosicionInicial.y = temp ;
+            PosicionInicial.x = PantallaDelDispositivo.width + AnchoEnemigo / 2 + 50;
+            // PosicionInicial.x = random.nextInt((int) PantallaDelDispositivo.width - (int) AnchoEnemigo) + AnchoEnemigo / 2;
+            //naveEnemiga.runAction(RotateTo.action(0.01f,0f));
+
+            PosicionFinal = new CCPoint();
+            PosicionFinal.x = -PosicionInicial.x + 50;
+            PosicionFinal.y = PosicionInicial.y;
+
+            arrTubos.add(TuboPuntos);
+
+            TuboPuntos.runAction(ScaleBy.action(0.01f,1.8f,1.8f));
+            TuboPuntos.setPosition(PosicionInicial.x, PosicionInicial.y);
+
+            TuboPuntos.runAction(MoveTo.action(6, PosicionFinal.x, PosicionFinal.y));
+            // Secuencia();
+
+            super.addChild(TuboPuntos);
 
             //PONER DOS TUBOS DIEFERENTES (ARRIBA Y ABAJO)
         }
@@ -361,13 +404,29 @@ public class clsJuego {
                 Log.d("DetectarColision","NO Hubo Colision");
             }
         }
+        void DetectarPuntos(){
+            boolean HuboPuntos;
+            HuboPuntos=false;
+            for(Sprite UnEnemigoAVerificar: arrTubos){
+                if(InterseccionEntreSprites(naveJugador,UnEnemigoAVerificar)){
+                    HuboPuntos=true;
+                }
+            }
+            if(HuboPuntos==true){
+                Log.d("DetectarColision","PUNTO");
+                puntos++;
+            }else {
+               // Log.d("DetectarColision","NO Hubo Colision");
+            }
+        }
 
         @Override
             public boolean ccTouchesBegan(MotionEvent event){
 
             activo = true;
-            SecuenciaArriba();
+            //SecuenciaArriba();
             //MoverNaveJugador(event.getX(),PantallaDelDispositivo.getHeight() - event.getY());
+            Salto();
             return true;
         }
         @Override
@@ -463,6 +522,14 @@ public class clsJuego {
         public void FinDelTrayecto(CocosNode ObjectoLlamador){
          super.removeChild(ObjectoLlamador,true);
             arrEnemigos.remove(ObjectoLlamador);
+        }
+        public void Gravedad()
+        {
+            naveJugador.setPosition(naveJugador.getPositionX(),naveJugador.getPositionY()-5);
+        }
+        public void Salto()
+        {
+            naveJugador.setPosition(naveJugador.getPositionX(),naveJugador.getPositionY()+10);
         }
 
     }
