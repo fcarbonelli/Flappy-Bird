@@ -5,13 +5,10 @@ import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import org.cocos2d.actions.Scheduler;
-import org.cocos2d.actions.instant.CallFunc;
 import org.cocos2d.actions.instant.CallFuncN;
 import org.cocos2d.actions.interval.IntervalAction;
 import org.cocos2d.actions.interval.MoveBy;
 import org.cocos2d.actions.interval.MoveTo;
-import org.cocos2d.actions.interval.RotateTo;
 import org.cocos2d.actions.interval.ScaleBy;
 import org.cocos2d.actions.interval.Sequence;
 import org.cocos2d.layers.Layer;
@@ -38,7 +35,8 @@ public class clsJuego {
     CCGLSurfaceView _VistaDelJuego;
     CCSize PantallaDelDispositivo;
     Context _ContextoDelJuego;
-
+    boolean activo = false;
+    float temp;
     Sprite naveJugador,naveEnemiga, ImagenFondo, BordeInferior;
     Label lblTitulo;
     ArrayList<Sprite> arrEnemigos;
@@ -136,10 +134,12 @@ public class clsJuego {
             TareaPonerEnemigos = new TimerTask() {
                 @Override
                 public void run() {
-                    PonerUnEnemigo();
+
+                    PonerUnTuboArriba();
+                    PonerUnTuboAbajo();
                 }
             };
-            // PonerUnEnemigo();
+            // PonerUnTuboArriba();
             Timer RelojEnemigos;
             RelojEnemigos = new Timer();
             RelojEnemigos.schedule(TareaPonerEnemigos, 0, 1500);
@@ -149,7 +149,11 @@ public class clsJuego {
                 @Override
                 public void run() {
                     DetectarColisiones();
-                    SecuenciaAbajo();
+                    if (activo ==false)
+                    {
+                        SecuenciaAbajo();
+                    }
+
                 }
             };
             Timer RelojVerificarImpactos;
@@ -173,15 +177,15 @@ public class clsJuego {
         }
 
         private void ColocarLabel() {
-            lblTitulo = Label.label("Juego Lolazo", "Verdana", 30);
+            lblTitulo = Label.label("Flappy Bird", "Verdana", 30);
             float AlturaTitulo;
             AlturaTitulo = lblTitulo.getHeight();
             lblTitulo.setPosition(PantallaDelDispositivo.width / 2, PantallaDelDispositivo.height - AlturaTitulo / 2);
             super.addChild(lblTitulo);
         }
 
-        void PonerUnEnemigo() {
-            naveEnemiga = Sprite.sprite("Tubo.png");
+        void PonerUnTuboArriba() {
+            naveEnemiga = Sprite.sprite("TuboArriba.png");
             Random random;
             random = new Random();
             int num = (random.nextInt(400));
@@ -194,6 +198,7 @@ public class clsJuego {
 
             PosicionInicial.y = PantallaDelDispositivo.height - AlturaEnemigo/2 + num - 150;
             PosicionInicial.x = PantallaDelDispositivo.width + AnchoEnemigo / 2;
+            temp = PosicionInicial.y;
             // PosicionInicial.x = random.nextInt((int) PantallaDelDispositivo.width - (int) AnchoEnemigo) + AnchoEnemigo / 2;
             //naveEnemiga.runAction(RotateTo.action(0.01f,0f));
 
@@ -208,6 +213,40 @@ public class clsJuego {
 
             naveEnemiga.runAction(MoveTo.action(6, PosicionFinal.x, PosicionFinal.y));
            // Secuencia();
+
+            super.addChild(naveEnemiga);
+
+            //PONER DOS TUBOS DIEFERENTES (ARRIBA Y ABAJO)
+        }
+        void PonerUnTuboAbajo() {
+            naveEnemiga = Sprite.sprite("TuboAbajo.png");
+            Random random;
+            random = new Random();
+            int num = (random.nextInt(400));
+
+            CCPoint PosicionInicial, PosicionFinal;
+            PosicionInicial = new CCPoint();
+            float AlturaEnemigo, AnchoEnemigo;
+            AlturaEnemigo = naveEnemiga.getHeight();
+            AnchoEnemigo = naveEnemiga.getWidth();
+
+            //PosicionInicial.y = PantallaDelDispositivo.height - AlturaEnemigo/2  - 150 -700;
+            PosicionInicial.y = temp -900;
+            PosicionInicial.x = PantallaDelDispositivo.width + AnchoEnemigo / 2;
+            // PosicionInicial.x = random.nextInt((int) PantallaDelDispositivo.width - (int) AnchoEnemigo) + AnchoEnemigo / 2;
+            //naveEnemiga.runAction(RotateTo.action(0.01f,0f));
+
+            PosicionFinal = new CCPoint();
+            PosicionFinal.x = -PosicionInicial.x;
+            PosicionFinal.y = PosicionInicial.y;
+
+            arrEnemigos.add(naveEnemiga);
+
+            naveEnemiga.runAction(ScaleBy.action(0.01f,1.8f,1.8f));
+            naveEnemiga.setPosition(PosicionInicial.x, PosicionInicial.y);
+
+            naveEnemiga.runAction(MoveTo.action(6, PosicionFinal.x, PosicionFinal.y));
+            // Secuencia();
 
             super.addChild(naveEnemiga);
 
@@ -324,9 +363,17 @@ public class clsJuego {
         }
 
         @Override
-        public boolean ccTouchesMoved(MotionEvent event){
+            public boolean ccTouchesBegan(MotionEvent event){
 
+            activo = true;
             SecuenciaArriba();
+            //MoverNaveJugador(event.getX(),PantallaDelDispositivo.getHeight() - event.getY());
+            return true;
+        }
+        @Override
+        public boolean ccTouchesEnded(MotionEvent event){
+
+            activo = false;
             //MoverNaveJugador(event.getX(),PantallaDelDispositivo.getHeight() - event.getY());
             return true;
         }
@@ -386,7 +433,7 @@ public class clsJuego {
         }
         public void SecuenciaAbajo(){
             MoveBy IrHaciaAbajo, IrHaciaArriba, IrHaciaDerecha;
-            IrHaciaAbajo=MoveBy.action(2,0,-300);
+            IrHaciaAbajo=MoveBy.action(1,0,-50);
             IrHaciaArriba=MoveBy.action(1,0,300);
             IrHaciaDerecha=MoveBy.action(1,300,0);
 
@@ -401,7 +448,7 @@ public class clsJuego {
         public void SecuenciaArriba(){
             MoveBy IrHaciaAbajo, IrHaciaArriba, IrHaciaDerecha;
             IrHaciaAbajo=MoveBy.action(1,0,-300);
-            IrHaciaArriba=MoveBy.action(1,0,300);
+            IrHaciaArriba=MoveBy.action(1,0,150);
             IrHaciaDerecha=MoveBy.action(1,300,0);
 
 
