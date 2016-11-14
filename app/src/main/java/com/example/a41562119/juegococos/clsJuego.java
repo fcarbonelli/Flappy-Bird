@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import org.cocos2d.actions.base.Action;
 import org.cocos2d.actions.instant.CallFuncN;
 import org.cocos2d.actions.interval.IntervalAction;
 import org.cocos2d.actions.interval.MoveBy;
@@ -117,7 +118,7 @@ public class clsJuego {
         public CapaDeFrente() {
 
             IniciarNave();
-            //ColocarLabel();
+            ColocarLabel();
             PonerBoton();
 
             arrEnemigos = new ArrayList<Sprite>();
@@ -186,7 +187,7 @@ public class clsJuego {
         }
 
         private void ColocarLabel() {
-            lblTitulo = Label.label("Flappy Bird: " + puntos, "Verdana", 30);
+            lblTitulo = Label.label("Flappy Bird: " + puntos/2 , "Verdana", 30);
             float AlturaTitulo;
             AlturaTitulo = lblTitulo.getHeight();
             lblTitulo.setPosition(PantallaDelDispositivo.width / 2, PantallaDelDispositivo.height - AlturaTitulo / 2);
@@ -274,18 +275,19 @@ public class clsJuego {
             AnchoEnemigo = TuboPuntos.getWidth();
 
             //PosicionInicial.y = PantallaDelDispositivo.height - AlturaEnemigo/2  - 150 -700;
-            PosicionInicial.y = temp ;
+            PosicionInicial.y = temp - 100 ;
             PosicionInicial.x = PantallaDelDispositivo.width + AnchoEnemigo / 2 + 50;
             // PosicionInicial.x = random.nextInt((int) PantallaDelDispositivo.width - (int) AnchoEnemigo) + AnchoEnemigo / 2;
             //naveEnemiga.runAction(RotateTo.action(0.01f,0f));
 
             PosicionFinal = new CCPoint();
-            PosicionFinal.x = -PosicionInicial.x + 50;
+            PosicionFinal.x = -PosicionInicial.x ;
             PosicionFinal.y = PosicionInicial.y;
 
             arrTubos.add(TuboPuntos);
 
-            TuboPuntos.runAction(ScaleBy.action(0.01f,1.8f,1.8f));
+            //TuboPuntos.runAction(ScaleBy.action(0.01f,1.8f,1.8f));
+
             TuboPuntos.setPosition(PosicionInicial.x, PosicionInicial.y);
 
             TuboPuntos.runAction(MoveTo.action(6, PosicionFinal.x, PosicionFinal.y));
@@ -410,11 +412,15 @@ public class clsJuego {
             for(Sprite UnEnemigoAVerificar: arrTubos){
                 if(InterseccionEntreSprites(naveJugador,UnEnemigoAVerificar)){
                     HuboPuntos=true;
+
+                    UnEnemigoAVerificar.setRotation(40);
+
+                    puntos++;
                 }
             }
             if(HuboPuntos==true){
                 Log.d("DetectarColision","PUNTO");
-                puntos++;
+
             }else {
                // Log.d("DetectarColision","NO Hubo Colision");
             }
@@ -525,11 +531,11 @@ public class clsJuego {
         }
         public void Gravedad()
         {
-            naveJugador.setPosition(naveJugador.getPositionX(),naveJugador.getPositionY()-5);
+            naveJugador.setPosition(naveJugador.getPositionX(),naveJugador.getPositionY()-15);
         }
         public void Salto()
         {
-            naveJugador.setPosition(naveJugador.getPositionX(),naveJugador.getPositionY()+10);
+            naveJugador.setPosition(naveJugador.getPositionX(),naveJugador.getPositionY()+35);
         }
 
     }
