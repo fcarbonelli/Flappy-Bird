@@ -34,13 +34,15 @@ import java.util.TimerTask;
 /**
  * Created by 41562119 on 13/9/2016.
  */
-public class clsJuego {
+public class
+clsJuego {
     CCGLSurfaceView _VistaDelJuego;
     CCSize PantallaDelDispositivo;
     Context _ContextoDelJuego;
     boolean activo = false;
     float temp;
     int puntos;
+    int Vidas = 3;
     Sprite naveJugador,naveEnemiga, ImagenFondo, BordeInferior, TuboPuntos;
     Label lblTitulo;
     ArrayList<Sprite> arrEnemigos;
@@ -119,7 +121,7 @@ public class clsJuego {
 
             IniciarNave();
             ColocarLabel();
-            PonerBoton();
+            //PonerBoton();
 
             arrEnemigos = new ArrayList<Sprite>();
             arrTubos = new ArrayList<Sprite>();
@@ -187,7 +189,7 @@ public class clsJuego {
         }
 
         private void ColocarLabel() {
-            lblTitulo = Label.label("Flappy Bird: " + puntos/2 , "Verdana", 30);
+            lblTitulo = Label.label("Flappy Bird: " + puntos + " Vidas" + Vidas, "Verdana", 30);
             float AlturaTitulo;
             AlturaTitulo = lblTitulo.getHeight();
             lblTitulo.setPosition(PantallaDelDispositivo.width / 2, PantallaDelDispositivo.height - AlturaTitulo / 2);
@@ -398,10 +400,17 @@ public class clsJuego {
             for(Sprite UnEnemigoAVerificar: arrEnemigos){
                 if(InterseccionEntreSprites(naveJugador,UnEnemigoAVerificar)){
                     HuboColision=true;
+                    UnEnemigoAVerificar.setPosition(UnEnemigoAVerificar.getPositionX(),UnEnemigoAVerificar.getPositionY()-500);
                 }
             }
             if(HuboColision==true){
                 Log.d("DetectarColision","Hubo Colision");
+                Vidas--;
+                if (Vidas == 0)
+                {
+                    PonerBoton();
+                    activo = true;
+                }
             }else {
                 Log.d("DetectarColision","NO Hubo Colision");
             }
@@ -481,8 +490,8 @@ public class clsJuego {
             BotonPausa=MenuItemImage.item("botonPausa.png","botonPausaPresionado.png", this,"PresionaBotonPausa");
 
             float PosicionBotonPausaX, PosicionBotonPausaY;
-            PosicionBotonPausaX=PantallaDelDispositivo.width-BotonPausa.getWidth()/2;
-            PosicionBotonPausaY=PantallaDelDispositivo.height-BotonPausa.getHeight()/2;
+            PosicionBotonPausaX=PantallaDelDispositivo.width/2;
+            PosicionBotonPausaY=PantallaDelDispositivo.height/2;
             BotonPausa.setPosition(PosicionBotonPausaX,PosicionBotonPausaY);
 
             Menu MenuDeBotones;
@@ -494,7 +503,8 @@ public class clsJuego {
 
         }
         public void PresionaBotonPausa(){
-
+            naveJugador.setPosition(PantallaDelDispositivo.width/2,naveJugador.getPositionY());
+            activo = false;
         }
         public void SecuenciaAbajo(){
             MoveBy IrHaciaAbajo, IrHaciaArriba, IrHaciaDerecha;
