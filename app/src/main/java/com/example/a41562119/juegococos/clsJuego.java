@@ -47,6 +47,8 @@ clsJuego {
     Label lblTitulo;
     ArrayList<Sprite> arrEnemigos;
     ArrayList<Sprite> arrTubos;
+    MenuItemImage BotonDisparo, BotonPausa, BotonMenu;
+    Menu MenuDeBotones;
     public clsJuego(CCGLSurfaceView _VistaDelJuego){
         _VistaDelJuego=_VistaDelJuego;
     }
@@ -146,7 +148,7 @@ clsJuego {
                     PonerUnTuboArriba();
                     PonerUnTuboAbajo();
                     PonerCorrector();
-                    ColocarLabel();
+
                 }
             };
             // PonerUnTuboArriba();
@@ -165,7 +167,7 @@ clsJuego {
                        // SecuenciaAbajo();
                         Gravedad();
                     }
-
+                    ColocarLabel();
                 }
             };
             Timer RelojVerificarImpactos;
@@ -193,6 +195,10 @@ clsJuego {
             float AlturaTitulo;
             AlturaTitulo = lblTitulo.getHeight();
             lblTitulo.setPosition(PantallaDelDispositivo.width / 2, PantallaDelDispositivo.height - AlturaTitulo / 2);
+            super.addChild(lblTitulo);
+        }
+        private void ActualizarLabel(){
+            lblTitulo = Label.label("Flappy Bird: " + puntos + " - Vidas: " + Vidas, "Verdana", 30);
             super.addChild(lblTitulo);
         }
 
@@ -400,17 +406,21 @@ clsJuego {
             for(Sprite UnEnemigoAVerificar: arrEnemigos){
                 if(InterseccionEntreSprites(naveJugador,UnEnemigoAVerificar)){
                     HuboColision=true;
-                    UnEnemigoAVerificar.setPosition(UnEnemigoAVerificar.getPositionX(),UnEnemigoAVerificar.getPositionY()-500);
+                    UnEnemigoAVerificar.runAction(ScaleBy.action(0.01f,0.00001f,0.00001f));
+                    //UnEnemigoAVerificar.setPosition(0,0);
+                    Vidas--;
+                    if (Vidas == 0)
+                    {
+                        PonerMenu();
+                        PonerBoton();
+
+                        activo = true;
+                    }
                 }
             }
             if(HuboColision==true){
                 Log.d("DetectarColision","Hubo Colision");
-                Vidas--;
-                if (Vidas == 0)
-                {
-                    PonerBoton();
-                    activo = true;
-                }
+
             }else {
                 Log.d("DetectarColision","NO Hubo Colision");
             }
@@ -479,7 +489,7 @@ clsJuego {
         }
 
         void PonerBoton(){
-            MenuItemImage BotonDisparo, BotonPausa;
+           // MenuItemImage BotonDisparo, BotonPausa;
             BotonDisparo=MenuItemImage.item("botonDisparo.png","botonDisparoPresionado.png", this,"PresionaBotonDisparo");
 
             float PosicionBotonDisparoX, PosicionBotonDisparoY;
@@ -494,8 +504,24 @@ clsJuego {
             PosicionBotonPausaY=PantallaDelDispositivo.height/2;
             BotonPausa.setPosition(PosicionBotonPausaX,PosicionBotonPausaY);
 
-            Menu MenuDeBotones;
+           // Menu MenuDeBotones;
             MenuDeBotones=Menu.menu(BotonDisparo,BotonPausa);
+            MenuDeBotones.setPosition(0,0);
+            super.addChild(MenuDeBotones);
+        }
+        void PonerMenu(){
+
+            BotonMenu=MenuItemImage.item("MenuPerdiste.png","MenuPerdiste.png", this,"Presiona");
+
+            float PosicionX, PosicionY;
+            PosicionX=PantallaDelDispositivo.width/2;
+            PosicionY=PantallaDelDispositivo.height/2;
+            BotonMenu.setPosition(PosicionX,PosicionY);
+
+            BotonMenu.runAction(ScaleBy.action(0.01f,2f,2f));
+
+            // Menu MenuDeBotones;
+            MenuDeBotones=Menu.menu(BotonMenu);
             MenuDeBotones.setPosition(0,0);
             super.addChild(MenuDeBotones);
         }
@@ -503,8 +529,12 @@ clsJuego {
 
         }
         public void PresionaBotonPausa(){
-            naveJugador.setPosition(PantallaDelDispositivo.width/2,naveJugador.getPositionY());
+            naveJugador.setPosition(naveJugador.getPositionX(),PantallaDelDispositivo.height/2);
             activo = false;
+            Vidas = 3;
+            puntos = 0;
+            BotonPausa.setPosition(0,0);
+            BotonMenu.setPosition(0,0);
         }
         public void SecuenciaAbajo(){
             MoveBy IrHaciaAbajo, IrHaciaArriba, IrHaciaDerecha;
@@ -541,7 +571,13 @@ clsJuego {
         }
         public void Gravedad()
         {
+            if(naveJugador.getPositionY() > 50)
+            {
             naveJugador.setPosition(naveJugador.getPositionX(),naveJugador.getPositionY()-15);
+            }else if(naveJugador.getPositionY() < 50)
+            {
+                naveJugador.setPosition(naveJugador.getPositionX(),50);
+            }
         }
         public void Salto()
         {
