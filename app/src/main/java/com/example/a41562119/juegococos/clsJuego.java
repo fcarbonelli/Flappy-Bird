@@ -226,7 +226,7 @@ clsJuego {
 
             arrEnemigos.add(naveEnemiga);
 
-            naveEnemiga.runAction(ScaleBy.action(0.01f,1.8f,1.8f));
+           // naveEnemiga.runAction(ScaleBy.action(0.01f,1.8f,1.8f));
             naveEnemiga.setPosition(PosicionInicial.x, PosicionInicial.y);
 
             naveEnemiga.runAction(MoveTo.action(6, PosicionFinal.x, PosicionFinal.y));
@@ -249,7 +249,7 @@ clsJuego {
             AnchoEnemigo = naveEnemiga.getWidth();
 
             //PosicionInicial.y = PantallaDelDispositivo.height - AlturaEnemigo/2  - 150 -700;
-            PosicionInicial.y = temp -900;
+            PosicionInicial.y = temp -1000;
             PosicionInicial.x = PantallaDelDispositivo.width + AnchoEnemigo / 2;
             // PosicionInicial.x = random.nextInt((int) PantallaDelDispositivo.width - (int) AnchoEnemigo) + AnchoEnemigo / 2;
             //naveEnemiga.runAction(RotateTo.action(0.01f,0f));
@@ -260,7 +260,7 @@ clsJuego {
 
             arrEnemigos.add(naveEnemiga);
 
-            naveEnemiga.runAction(ScaleBy.action(0.01f,1.8f,1.8f));
+            //naveEnemiga.runAction(ScaleBy.action(0.01f,1.8f,1.8f));
             naveEnemiga.setPosition(PosicionInicial.x, PosicionInicial.y);
 
             naveEnemiga.runAction(MoveTo.action(6, PosicionFinal.x, PosicionFinal.y));
@@ -406,7 +406,8 @@ clsJuego {
             for(Sprite UnEnemigoAVerificar: arrEnemigos){
                 if(InterseccionEntreSprites(naveJugador,UnEnemigoAVerificar)){
                     HuboColision=true;
-                    UnEnemigoAVerificar.runAction(ScaleBy.action(0.01f,0.00001f,0.00001f));
+                   UnEnemigoAVerificar.runAction(ScaleBy.action(0.0001f,0.00001f,0.00001f));
+                    //UnEnemigoAVerificar.setRotation(-90);
                     //UnEnemigoAVerificar.setPosition(0,0);
                     Vidas--;
                     if (Vidas == 0)
@@ -574,6 +575,7 @@ clsJuego {
             if(naveJugador.getPositionY() > 50)
             {
             naveJugador.setPosition(naveJugador.getPositionX(),naveJugador.getPositionY()-15);
+             //   naveJugador.runAction(MoveTo.action(0.1f,naveJugador.getPositionX(),naveJugador.getPositionY()-15));
             }else if(naveJugador.getPositionY() < 50)
             {
                 naveJugador.setPosition(naveJugador.getPositionX(),50);
@@ -581,7 +583,8 @@ clsJuego {
         }
         public void Salto()
         {
-            naveJugador.setPosition(naveJugador.getPositionX(),naveJugador.getPositionY()+35);
+           // naveJugador.setPosition(naveJugador.getPositionX(),naveJugador.getPositionY()+35);
+            naveJugador.runAction(MoveTo.action(0.0001f,naveJugador.getPositionX(),naveJugador.getPositionY()+50));
         }
 
     }
