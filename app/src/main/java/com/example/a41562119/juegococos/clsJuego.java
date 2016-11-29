@@ -167,7 +167,7 @@ clsJuego {
                        // SecuenciaAbajo();
                         Gravedad();
                     }
-                    ColocarLabel();
+                    ActualizarLabel();
                 }
             };
             Timer RelojVerificarImpactos;
@@ -198,7 +198,7 @@ clsJuego {
             super.addChild(lblTitulo);
         }
         private void ActualizarLabel(){
-            lblTitulo = Label.label("Flappy Bird: " + puntos + " - Vidas: " + Vidas, "Verdana", 30);
+            lblTitulo.setString( "Flappy Bird: " + puntos + " - Vidas: " + Vidas);
             super.addChild(lblTitulo);
         }
 
@@ -206,7 +206,7 @@ clsJuego {
             naveEnemiga = Sprite.sprite("TuboArriba.png");
             Random random;
             random = new Random();
-            int num = (random.nextInt(400));
+            int num = (random.nextInt(600));
 
             CCPoint PosicionInicial, PosicionFinal;
             PosicionInicial = new CCPoint();
